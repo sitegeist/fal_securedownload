@@ -71,11 +71,7 @@ class AssetAccessViewHelper extends AbstractConditionViewHelper
                 $access = true;
             } else {
                 $feGroups = $file->getProperty('fe_groups');
-                if ((string)$feGroups !== '') {
-                    $access = $checkPermissionsService->matchFeGroupsWithFeUser($feGroups, $userFeGroups);
-                } else {
-                    $access = true;
-                }
+                $access = (string)$feGroups !== '' ? $checkPermissionsService->matchFeGroupsWithFeUser($feGroups, $userFeGroups) : true;
             }
         }
 

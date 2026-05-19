@@ -34,11 +34,8 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 class FileTreeController extends ActionController
 {
-    protected ResourceFactory $resourceFactory;
-
-    public function __construct(ResourceFactory $resourceFactory)
+    public function __construct(protected ResourceFactory $resourceFactory)
     {
-        $this->resourceFactory = $resourceFactory;
     }
 
     /**

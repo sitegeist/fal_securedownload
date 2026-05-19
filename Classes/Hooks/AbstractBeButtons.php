@@ -73,33 +73,24 @@ abstract class AbstractBeButtons
             $folder = null;
         }
 
-        if ($folder instanceof Folder
-            && !$folder->getStorage()->isPublic()
-            && in_array(
-                $folder->getRole(),
-                [Folder::ROLE_DEFAULT, Folder::ROLE_USERUPLOAD]
-            )
-        ) {
-            if ($GLOBALS['BE_USER']->check('tables_modify', 'tx_falsecuredownload_folder')) {
-                /** @var Utility $utility */
-                $utility = GeneralUtility::makeInstance(Utility::class);
-                $folderRecord = $utility->getFolderRecord($folder);
-
-                if ($folderRecord) {
-                    $buttons[] = $this->createLink(
-                        $this->sL('clickmenu.folderpermissions'),
-                        $this->sL('clickmenu.folderpermissions'),
-                        $this->getIcon('folder'),
-                        $this->buildEditUrl($folderRecord['uid'])
-                    );
-                } else {
-                    $buttons[] = $this->createLink(
-                        $this->sL('clickmenu.folderpermissions'),
-                        $this->sL('clickmenu.folderpermissions'),
-                        $this->getIcon('folder'),
-                        $this->buildAddUrl($folder)
-                    );
-                }
+        if ($folder instanceof Folder && !$folder->getStorage()->isPublic() && in_array($folder->getRole(), [Folder::ROLE_DEFAULT, Folder::ROLE_USERUPLOAD]) && $GLOBALS['BE_USER']->check('tables_modify', 'tx_falsecuredownload_folder')) {
+            /** @var Utility $utility */
+            $utility = GeneralUtility::makeInstance(Utility::class);
+            $folderRecord = $utility->getFolderRecord($folder);
+            if ($folderRecord) {
+                $buttons[] = $this->createLink(
+                    $this->sL('clickmenu.folderpermissions'),
+                    $this->sL('clickmenu.folderpermissions'),
+                    $this->getIcon('folder'),
+                    $this->buildEditUrl($folderRecord['uid'])
+                );
+            } else {
+                $buttons[] = $this->createLink(
+                    $this->sL('clickmenu.folderpermissions'),
+                    $this->sL('clickmenu.folderpermissions'),
+                    $this->getIcon('folder'),
+                    $this->buildAddUrl($folder)
+                );
             }
         }
 
@@ -192,6 +183,6 @@ abstract class AbstractBeButtons
      */
     protected function sL(string $key): string
     {
-        return $this->getLangService()->sL('LLL:EXT:fal_securedownload/Resources/Private/Language/locallang_be.xlf:' . $key);
+        return $this->getLangService()->sL('fal_securedownload.be:');
     }
 }

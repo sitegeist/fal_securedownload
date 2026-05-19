@@ -79,19 +79,17 @@ class ItemProvider extends AbstractProvider
     public function addItems(array $items): array
     {
         $this->initialize();
-        if ($this->folder instanceof Folder) {
-            if ($this->backendUser->check('tables_modify', 'tx_falsecuredownload_folder')) {
-                $items += $this->prepareItems([
-                    'permissions_divider' => [
-                        'type' => 'divider',
-                    ],
-                    'permissions' => [
-                        'label' => 'LLL:EXT:fal_securedownload/Resources/Private/Language/locallang_be.xlf:clickmenu.folderpermissions',
-                        'iconIdentifier' => 'action-folder',
-                        'callbackAction' => 'folderPermissions',
-                    ],
-                ]);
-            }
+        if ($this->folder instanceof Folder && $this->backendUser->check('tables_modify', 'tx_falsecuredownload_folder')) {
+            $items += $this->prepareItems([
+                'permissions_divider' => [
+                    'type' => 'divider',
+                ],
+                'permissions' => [
+                    'label' => 'LLL:EXT:fal_securedownload/Resources/Private/Language/locallang_be.xlf:clickmenu.folderpermissions',
+                    'iconIdentifier' => 'action-folder',
+                    'callbackAction' => 'folderPermissions',
+                ],
+            ]);
         }
 
         return $items;

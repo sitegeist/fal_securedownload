@@ -32,12 +32,10 @@ use TYPO3\CMS\Core\Resource\ResourceInterface;
 
 final class BeforeFileDumpEvent
 {
-    private ResourceInterface $file;
     private ModifyFileDumpEventListener $caller;
 
-    public function __construct(ResourceInterface $file, ModifyFileDumpEventListener $caller)
+    public function __construct(private ResourceInterface $file, ModifyFileDumpEventListener $caller)
     {
-        $this->file = $file;
         $this->caller = $caller;
     }
 

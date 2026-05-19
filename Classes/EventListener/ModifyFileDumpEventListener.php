@@ -32,7 +32,9 @@ use BeechIt\FalSecuredownload\Context\UserAspect;
 use BeechIt\FalSecuredownload\Events\BeforeFileDumpEvent;
 use BeechIt\FalSecuredownload\Events\BeforeRedirectsEvent;
 use BeechIt\FalSecuredownload\Security\CheckPermissions;
+use Doctrine\DBAL\Exception;
 use InvalidArgumentException;
+use JetBrains\PhpStorm\NoReturn;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use TYPO3\CMS\Core\Context\Context;
@@ -61,27 +63,28 @@ class ModifyFileDumpEventListener
     protected string $forceDownloadForExt = '';
     protected bool $resumableDownload = false;
     protected Context $context;
-    private readonly EventDispatcherInterface $eventDispatcher;
     private ModifyFileDumpEvent $event;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher, private readonly ConnectionPool $connectionPool)
+    public function __construct(private readonly EventDispatcherInterface $eventDispatcher, private readonly ConnectionPool $connectionPool, private readonly LinkService $linkService)
     {
         $this->context = GeneralUtility::makeInstance(Context::class);
 
-        if (ExtensionConfiguration::loginRedirectUrl()) {
+        if (ExtensionConfiguration::loginRedirectUrl() !== '' && ExtensionConfiguration::loginRedirectUrl() !== '0') {
             $this->loginRedirectUrl = ExtensionConfiguration::loginRedirectUrl();
         }
-        if (ExtensionConfiguration::noAccessRedirectUrl()) {
+        if (ExtensionConfiguration::noAccessRedirectUrl() !== '' && ExtensionConfiguration::noAccessRedirectUrl() !== '0') {
             $this->noAccessRedirectUrl = ExtensionConfiguration::noAccessRedirectUrl();
         }
         $this->forceDownload = ExtensionConfiguration::forceDownload();
-        if (ExtensionConfiguration::forceDownloadForExt()) {
+        if (ExtensionConfiguration::forceDownloadForExt() !== '' && ExtensionConfiguration::forceDownloadForExt() !== '0') {
             $this->forceDownloadForExt = ExtensionConfiguration::forceDownloadForExt();
         }
         $this->resumableDownload = ExtensionConfiguration::resumableDownload();
-        $this->eventDispatcher = $eventDispatcher;
     }
 
+    /**
+     * @throws Exception
+     */
     public function __invoke(ModifyFileDumpEvent $event): void
     {
         $this->event = $event;
@@ -103,17 +106,14 @@ class ModifyFileDumpEventListener
      * or 401 if authentication is required
      *
      * @param ResourceInterface $file
+     * @throws Exception
      */
     private function checkFileAccess(ResourceInterface $file): void
     {
         if (!$file instanceof FileInterface) {
             throw new RuntimeException('Given $file is not a file.', 1469019515);
         }
-        if (method_exists($file, 'getOriginalFile')) {
-            $this->originalFile = $file->getOriginalFile();
-        } else {
-            $this->originalFile = $file;
-        }
+        $this->originalFile = method_exists($file, 'getOriginalFile') ? $file->getOriginalFile() : $file;
 
         $loginRedirectUrl = $this->loginRedirectUrl;
         $noAccessRedirectUrl = $this->noAccessRedirectUrl;
@@ -141,8 +141,8 @@ class ModifyFileDumpEventListener
             $columns = [
                 'tstamp' => time(),
                 'crdate' => time(),
-                'feuser' => (int)$this->feUser->user['uid'],
-                'file' => (int)$this->originalFile->getUid(),
+                'feuser' => (int) $this->feUser->user['uid'],
+                'file' => (int) $this->originalFile->getUid(),
             ];
 
             $this->connectionPool
@@ -173,12 +173,12 @@ class ModifyFileDumpEventListener
      * @param bool $asDownload
      * @param bool $resumableDownload
      */
-    protected function dumpFileContents(FileInterface $file, bool $asDownload, bool $resumableDownload)
+    protected function dumpFileContents(FileInterface $file, bool $asDownload, bool $resumableDownload): void
     {
         $downloadName = $file->hasProperty('download_name') && $file->getProperty('download_name') ? $file->getProperty('download_name') : $file->getName();
 
         // Make sure downloadName has a file extension
-        $fileParts = pathinfo($downloadName);
+        $fileParts = pathinfo((string) $downloadName);
         if (empty($fileParts['extension'])) {
             $downloadName .= '.' . $file->getExtension();
         }
@@ -266,7 +266,7 @@ class ModifyFileDumpEventListener
     }
 
     /**
-     * Check if user is logged in
+     * Check if a user is logged in
      */
     protected function isLoggedIn(): bool
     {
@@ -279,7 +279,7 @@ class ModifyFileDumpEventListener
     }
 
     /**
-     * Check if current user has enough permissions to view file
+     * Check if the current user has enough permissions to view the file
      */
     protected function checkPermissions(): bool
     {
@@ -321,9 +321,9 @@ class ModifyFileDumpEventListener
      * @throws AspectNotFoundException
      * @throws AspectPropertyNotFoundException
      */
-    protected function initializeUserAuthentication()
+    protected function initializeUserAuthentication(): void
     {
-        if ($this->feUser === null) {
+        if (!$this->feUser instanceof FrontendUserAuthentication) {
             /** @var UserAspect $userAspect */
             $userAspect = $this->context->getAspect('beechit.user');
             $this->feUser = $userAspect->get('user');
@@ -343,7 +343,8 @@ class ModifyFileDumpEventListener
     /**
      * Redirect to url
      */
-    protected function redirectToUrl(string $url)
+    #[NoReturn]
+    protected function redirectToUrl(string $url): void
     {
         $url = str_replace(
             '###REQUEST_URI###',
@@ -365,7 +366,7 @@ class ModifyFileDumpEventListener
     protected function resolveUrl(string $url): string
     {
         try {
-            $urlParameters = GeneralUtility::makeInstance(LinkService::class)->resolve($url);
+            $urlParameters = $this->linkService->resolve($url);
         } catch (UnknownLinkHandlerException) {
             throw new InvalidArgumentException(
                 'Redirects URL can only handle TYPO3 urls of types "page" or "url".',
@@ -398,7 +399,7 @@ class ModifyFileDumpEventListener
             ]);
         }
 
-        return (string)$uri;
+        return (string) $uri;
     }
 
     /**
@@ -413,7 +414,7 @@ class ModifyFileDumpEventListener
         if (!$range || $range === '-') {
             return [0, $fileSize - 1];
         }
-        if (!preg_match('/^bytes=(\d*)-(\d*)$/', $range, $matches)) {
+        if (!preg_match('/^bytes=(\d*)-(\d*)$/', (string) $range, $matches)) {
             return [];
         }
         if ($matches[1] === '') {
@@ -432,6 +433,6 @@ class ModifyFileDumpEventListener
         if ($start < 0 || $start > $end) {
             return [];
         }
-        return [(int)$start, (int)$end];
+        return [(int) $start, (int) $end];
     }
 }

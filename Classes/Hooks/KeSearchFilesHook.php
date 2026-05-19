@@ -71,7 +71,7 @@ class KeSearchFilesHook implements SingletonInterface
         if ($fileObject instanceof File && !$fileObject->getStorage()->isPublic()) {
             $resourcePermissions = $this->checkPermissionsService->getPermissions($fileObject);
             // If there are already permissions set, refine these with actual file permissions
-            if ($feGroups) {
+            if ($feGroups !== '' && $feGroups !== '0') {
                 $feGroups = implode(
                     ',',
                     ArrayUtility::keepItemsInArray(explode(',', $resourcePermissions), $feGroups)

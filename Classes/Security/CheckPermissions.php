@@ -46,12 +46,10 @@ class CheckPermissions implements SingletonInterface
 {
     protected Utility $utilityService;
     protected array $checkFolderRootLineAccessCache = [];
-    protected EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(protected EventDispatcherInterface $eventDispatcher)
     {
         $this->utilityService = GeneralUtility::makeInstance(Utility::class);
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -63,7 +61,7 @@ class CheckPermissions implements SingletonInterface
      */
     public function checkFileAccessForCurrentFeUser(FileInterface $file): bool
     {
-        $userFeGroups = !isset($GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.user')->user) ? false : $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.user')->groupData['uid'];
+        $userFeGroups = isset($GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.user')->user) ? $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.user')->groupData['uid'] : false;
         try {
             return $this->checkFileAccess($file, $userFeGroups);
         } catch (FolderDoesNotExistException) {
@@ -98,7 +96,7 @@ class CheckPermissions implements SingletonInterface
         }
 
         foreach ($backendUser->getFileMountRecords() as $fileMountRecord) {
-            if (!str_contains($fileMountRecord['identifier'], ':')) {
+            if (!str_contains((string) $fileMountRecord['identifier'], ':')) {
                 continue;
             }
 
@@ -187,11 +185,9 @@ class CheckPermissions implements SingletonInterface
                     $folderRecord = $this->utilityService->getFolderRecord($rootlineFolder);
 
                     // if record found check permissions
-                    if ($folderRecord) {
-                        if (!$this->matchFeGroupsWithFeUser($folderRecord['fe_groups'], $userFeGroups)) {
-                            $this->checkFolderRootLineAccessCache[$cacheIdentifier] = false;
-                            break;
-                        }
+                    if ($folderRecord && !$this->matchFeGroupsWithFeUser($folderRecord['fe_groups'], $userFeGroups)) {
+                        $this->checkFolderRootLineAccessCache[$cacheIdentifier] = false;
+                        break;
                     }
                 }
             } catch (FolderDoesNotExistException) {

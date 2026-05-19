@@ -18,11 +18,8 @@ use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 class EidFrontendAuthentication implements MiddlewareInterface
 {
-    protected Context $context;
-
-    public function __construct(Context $context)
+    public function __construct(protected Context $context)
     {
-        $this->context = $context;
     }
 
     /**
@@ -65,7 +62,7 @@ class EidFrontendAuthentication implements MiddlewareInterface
     }
 
     /**
-     * Register the frontend user as aspect
+     * Register the frontend user as an aspect
      */
     protected function setFrontendUserAspect(AbstractUserAuthentication $user): void
     {
@@ -73,7 +70,7 @@ class EidFrontendAuthentication implements MiddlewareInterface
     }
 
     /**
-     * Register the backend user as aspect
+     * Register the backend user as an aspect
      */
     protected function setBackendUserAspect(AbstractUserAuthentication $user): void
     {

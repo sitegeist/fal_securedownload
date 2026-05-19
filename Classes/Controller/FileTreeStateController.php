@@ -38,11 +38,8 @@ use TYPO3\CMS\Core\Http\Response;
 
 class FileTreeStateController
 {
-    protected Context $context;
-
-    public function __construct(Context $context, protected LeafStateService $leafStateService)
+    public function __construct(protected Context $context, protected LeafStateService $leafStateService)
     {
-        $this->context = $context;
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use BeechIt\FalSecuredownload\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 

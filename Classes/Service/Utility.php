@@ -105,7 +105,7 @@ class Utility implements SingletonInterface
             }
         }
 
-        if (!empty($record)) {
+        if ($record !== []) {
             $queryBuilder = $this->getQueryBuilder();
             $queryBuilder
                 ->update('tx_falsecuredownload_folder')

@@ -33,11 +33,8 @@ use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 class LeafStateService implements SingletonInterface
 {
-    protected ResourceFactory $resourceFactory;
-
-    public function __construct(ResourceFactory $resourceFactory)
+    public function __construct(protected ResourceFactory $resourceFactory)
     {
-        $this->resourceFactory = $resourceFactory;
     }
 
     /**

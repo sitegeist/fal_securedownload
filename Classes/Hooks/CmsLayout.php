@@ -37,11 +37,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CmsLayout
 {
-    protected ResourceFactory $resourceFactory;
-
-    public function __construct(ResourceFactory $resourceFactory)
+    public function __construct(protected ResourceFactory $resourceFactory)
     {
-        $this->resourceFactory = $resourceFactory;
     }
 
     /**
@@ -101,7 +98,7 @@ class CmsLayout
      */
     protected function renderSettingsAsTable(array $tableData): string
     {
-        if (count($tableData) == 0) {
+        if (count($tableData) === 0) {
             return '';
         }
 
@@ -140,7 +137,7 @@ class CmsLayout
      */
     protected function sL(string $key): string
     {
-        return $this->getLangService()->sL('LLL:EXT:fal_securedownload/Resources/Private/Language/locallang_be.xlf:' . $key);
+        return $this->getLangService()->sL('fal_securedownload.be:');
     }
 
     protected function getLangService(): LanguageService

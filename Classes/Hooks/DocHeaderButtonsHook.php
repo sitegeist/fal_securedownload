@@ -27,17 +27,23 @@ declare(strict_types=1);
 
 namespace BeechIt\FalSecuredownload\Hooks;
 
+use TYPO3\CMS\Backend\Template\Components\ComponentFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
- * Hook to add extra button to DocHeaderButtons in file list
+ * Hook to add an extra button to DocHeaderButtons in a file list
  */
 class DocHeaderButtonsHook extends AbstractBeButtons
 {
+    public function __construct(private readonly ComponentFactory $componentFactory, ?ResourceFactory $resourceFactory = null)
+    {
+        parent::__construct($resourceFactory);
+    }
     /**
      * Create button
      */
@@ -67,7 +73,7 @@ class DocHeaderButtonsHook extends AbstractBeButtons
         }
 
         foreach ($this->generateButtons($identifier) as $buttonInfo) {
-            $button = $buttonBar->makeLinkButton();
+            $button = $this->componentFactory->createLinkButton();
             $button->setIcon($buttonInfo['icon']);
             $button->setTitle($buttonInfo['title']);
             $button->setHref($buttonInfo['url']);

@@ -27,11 +27,11 @@ declare(strict_types=1);
 
 namespace BeechIt\FalSecuredownload\ViewHelpers;
 
+use TYPO3\CMS\Core\Crypto\HashAlgo;
 use TYPO3\CMS\Core\Crypto\HashService;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
 
 /**
@@ -45,6 +45,13 @@ class DownloadLinkViewHelper extends AbstractTagBasedViewHelper
      * @var string
      */
     protected $tagName = 'a';
+    /**
+     * Constructor
+     */
+    public function __construct(private readonly HashService $hashService)
+    {
+        parent::__construct();
+    }
 
     /**
      * Initialize arguments
@@ -54,7 +61,6 @@ class DownloadLinkViewHelper extends AbstractTagBasedViewHelper
     public function initializeArguments(): void
     {
         parent::initializeArguments();
-        $this->registerUniversalTagAttributes();
         $this->registerTagAttribute('name', 'string', 'Specifies the name of an anchor');
         $this->registerTagAttribute('rel', 'string', 'Specifies the relationship between the current document and the linked document');
         $this->registerTagAttribute('rev', 'string', 'Specifies the relationship between the linked document and the current document');
@@ -82,7 +88,7 @@ class DownloadLinkViewHelper extends AbstractTagBasedViewHelper
             $queryParameterArray['t'] = 'p';
         }
 
-        $queryParameterArray['token'] = GeneralUtility::makeInstance(HashService::class)->hmac(implode('|', $queryParameterArray), 'resourceStorageDumpFile');
+        $queryParameterArray['token'] = $this->hashService->hmac(implode('|', $queryParameterArray), 'resourceStorageDumpFile', HashAlgo::SHA3_256);
         $queryParameterArray['download'] = '';
         $uri = 'index.php?' . str_replace('+', '%20', http_build_query($queryParameterArray));
 

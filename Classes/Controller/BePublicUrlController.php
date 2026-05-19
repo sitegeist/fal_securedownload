@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace BeechIt\FalSecuredownload\Controller;
 
+use TYPO3\CMS\Core\Crypto\HashAlgo;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -19,25 +20,14 @@ use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Ajax controller for public url in BE
  */
 class BePublicUrlController extends AbstractApplication
 {
-    protected ResourceFactory $resourceFactory;
-    protected ResponseFactoryInterface $responseFactory;
-    private readonly ProcessedFileRepository $processedFileRepository;
-
-    public function __construct(
-        ResourceFactory $resourceFactory,
-        ResponseFactoryInterface $responseFactory,
-        ProcessedFileRepository $processedFileRepository
-    ) {
-        $this->resourceFactory = $resourceFactory;
-        $this->responseFactory = $responseFactory;
-        $this->processedFileRepository = $processedFileRepository;
+    public function __construct(protected ResourceFactory $resourceFactory, protected ResponseFactoryInterface $responseFactory, private readonly ProcessedFileRepository $processedFileRepository, private readonly HashService $hashService)
+    {
     }
 
     /**
@@ -57,7 +47,7 @@ class BePublicUrlController extends AbstractApplication
         }
 
         if (
-            GeneralUtility::makeInstance(HashService::class)->hmac(implode('|', $parameters), 'BeResourceStorageDumpFile') === ($GLOBALS['TYPO3_REQUEST']->getParsedBody()['fal_token'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['fal_token'] ?? null)
+            $this->hashService->hmac(implode('|', $parameters), 'BeResourceStorageDumpFile', HashAlgo::SHA3_256) === ($GLOBALS['TYPO3_REQUEST']->getParsedBody()['fal_token'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['fal_token'] ?? null)
         ) {
             if (isset($parameters['f'])) {
                 try {

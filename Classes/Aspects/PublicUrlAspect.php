@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace BeechIt\FalSecuredownload\Aspects;
 
+use TYPO3\CMS\Core\Crypto\HashAlgo;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Crypto\HashService;
@@ -37,7 +38,6 @@ use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceInterface;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class PublicUrlAspect implements SingletonInterface
 {
@@ -45,6 +45,9 @@ class PublicUrlAspect implements SingletonInterface
      * Flag to en-/disable rendering of BE user link instead of FE link
      */
     protected bool $enabled = true;
+    public function __construct(private readonly HashService $hashService, private readonly UriBuilder $uriBuilder)
+    {
+    }
 
     public function getEnabled(): bool
     {
@@ -83,10 +86,10 @@ class PublicUrlAspect implements SingletonInterface
                 $queryParameterArray['p'] = $resourceObject->getUid();
                 $queryParameterArray['t'] = 'p';
             }
-            $queryParameterArray['fal_token'] = GeneralUtility::makeInstance(HashService::class)->hmac(implode('|', $queryParameterArray), 'BeResourceStorageDumpFile');
+            $queryParameterArray['fal_token'] = $this->hashService->hmac(implode('|', $queryParameterArray), 'BeResourceStorageDumpFile', HashAlgo::SHA3_256);
 
             /** @var UriBuilder $uriBuilder */
-            $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+            $uriBuilder = $this->uriBuilder;
 
             /**
              * $urlData['publicUrl'] is passed by reference, so we can change that here and the value will be taken into account

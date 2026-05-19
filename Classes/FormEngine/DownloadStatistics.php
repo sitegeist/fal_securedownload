@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace BeechIt\FalSecuredownload\FormEngine;
 
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use Doctrine\DBAL\Exception;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Core\Database\Connection;
@@ -36,7 +37,7 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 class DownloadStatistics extends AbstractNode
 {
     protected array $resultArray = [];
-    public function __construct(private readonly \TYPO3\CMS\Core\Database\ConnectionPool $connectionPool) {}
+    public function __construct(private readonly ConnectionPool $connectionPool) {}
 
     public function render(): array
     {
@@ -80,8 +81,8 @@ class DownloadStatistics extends AbstractNode
         $lang = $this->getLanguageService();
         $markup = [];
         if ($statistics) {
-            $titleFileName = $lang->sL('LLL:EXT:fal_securedownload/Resources/Private/Language/locallang_be.xlf:downloadStatistics.fileName');
-            $titleDownloads = $lang->sL('LLL:EXT:fal_securedownload/Resources/Private/Language/locallang_be.xlf:downloadStatistics.downloads');
+            $titleFileName = $lang->sL('fal_securedownload.be:downloadStatistics.fileName');
+            $titleDownloads = $lang->sL('fal_securedownload.be:downloadStatistics.downloads');
 
             $markup[] = '<table class="table table-bordered">';
             $markup[] = '<thead><tr><th>' . htmlspecialchars($titleFileName) . '</th><th>' . htmlspecialchars($titleDownloads) . '</th></tr></thead>';
@@ -93,7 +94,7 @@ class DownloadStatistics extends AbstractNode
             $markup[] = '</tbody>';
             $markup[] = '</table>';
         } else {
-            $noDownloads = $lang->sL('LLL:EXT:fal_securedownload/Resources/Private/Language/locallang_be.xlf:downloadStatistics.noDownloads');
+            $noDownloads = $lang->sL('fal_securedownload.be:downloadStatistics.noDownloads');
             $markup[] = '<p>' . htmlspecialchars($noDownloads) . '</p>';
         }
 
