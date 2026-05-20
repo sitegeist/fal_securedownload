@@ -34,7 +34,6 @@ use BeechIt\FalSecuredownload\Events\BeforeRedirectsEvent;
 use BeechIt\FalSecuredownload\Security\CheckPermissions;
 use Doctrine\DBAL\Exception;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\NoReturn;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use TYPO3\CMS\Core\Context\Context;
@@ -46,6 +45,7 @@ use TYPO3\CMS\Core\LinkHandling\Exception\UnknownLinkHandlerException;
 use TYPO3\CMS\Core\LinkHandling\LinkService;
 use TYPO3\CMS\Core\Resource\Event\ModifyFileDumpEvent;
 use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Resource\ResourceInterface;
@@ -56,7 +56,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class ModifyFileDumpEventListener
 {
     protected ?FrontendUserAuthentication $feUser = null;
-    protected FileInterface $originalFile;
+    protected File $originalFile;
     protected string $loginRedirectUrl = '';
     protected string $noAccessRedirectUrl = '';
     protected bool $forceDownload = false;
@@ -95,7 +95,7 @@ class ModifyFileDumpEventListener
      * @see https://github.com/beechit/fal_securedownload/issues/37
      * @noinspection PhpUnused
      */
-    public function getFeUser(): FrontendUserAuthentication
+    public function getFeUser(): ?FrontendUserAuthentication
     {
         return $this->feUser;
     }
@@ -113,7 +113,9 @@ class ModifyFileDumpEventListener
         if (!$file instanceof FileInterface) {
             throw new RuntimeException('Given $file is not a file.', 1469019515);
         }
-        $this->originalFile = method_exists($file, 'getOriginalFile') ? $file->getOriginalFile() : $file;
+        $resolvedFile = method_exists($file, 'getOriginalFile') ? $file->getOriginalFile() : $file;
+        assert($resolvedFile instanceof File);
+        $this->originalFile = $resolvedFile;
 
         $loginRedirectUrl = $this->loginRedirectUrl;
         $noAccessRedirectUrl = $this->noAccessRedirectUrl;
@@ -289,7 +291,7 @@ class ModifyFileDumpEventListener
             return false;
         }
 
-        /** @var $checkPermissionsService CheckPermissions */
+        /** @var CheckPermissions $checkPermissionsService */
         $checkPermissionsService = GeneralUtility::makeInstance(CheckPermissions::class);
 
         if ($checkPermissionsService->checkBackendUserFileAccess($this->originalFile)) {
@@ -318,15 +320,19 @@ class ModifyFileDumpEventListener
 
     /**
      * Initialize feUser
+     *
      * @throws AspectNotFoundException
      * @throws AspectPropertyNotFoundException
+     * @phpstan-assert FrontendUserAuthentication $this->feUser
      */
     protected function initializeUserAuthentication(): void
     {
         if (!$this->feUser instanceof FrontendUserAuthentication) {
             /** @var UserAspect $userAspect */
             $userAspect = $this->context->getAspect('beechit.user');
-            $this->feUser = $userAspect->get('user');
+            /** @var FrontendUserAuthentication $feUser */
+            $feUser = $userAspect->get('user');
+            $this->feUser = $feUser;
             $this->feUser->fetchGroupData($this->event->getRequest());
         }
     }
@@ -343,8 +349,7 @@ class ModifyFileDumpEventListener
     /**
      * Redirect to url
      */
-    #[NoReturn]
-    protected function redirectToUrl(string $url): void
+    protected function redirectToUrl(string $url): never
     {
         $url = str_replace(
             '###REQUEST_URI###',
@@ -352,7 +357,7 @@ class ModifyFileDumpEventListener
             $url
         );
 
-        if (stripos($url, 't3://') === 0) {
+        if (str_starts_with(strtolower($url), 't3://')) {
             $url = $this->resolveUrl($url);
         }
 

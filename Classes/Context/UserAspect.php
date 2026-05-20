@@ -31,20 +31,14 @@ use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
  */
 class UserAspect implements AspectInterface
 {
-    /**
-     * @var AbstractUserAuthentication|stdClass
-     */
-    protected $user;
+    protected AbstractUserAuthentication|stdClass $user;
 
-    /**
-     * @param AbstractUserAuthentication|null $user
-     */
     public function __construct(?AbstractUserAuthentication $user = null)
     {
         $this->user = $user ?? $this->createPseudoUser();
     }
 
-    private function createPseudoUser(): object
+    private function createPseudoUser(): stdClass
     {
         $user = new stdClass();
         $user->user = [];
@@ -52,13 +46,9 @@ class UserAspect implements AspectInterface
     }
 
     /**
-     * Fetch common information about the user
-     *
-     * @param string $name
-     * @return AbstractUserAuthentication|stdClass
      * @throws AspectPropertyNotFoundException
      */
-    public function get(string $name)
+    public function get(string $name): AbstractUserAuthentication|stdClass
     {
         if ($name === 'user') {
             return $this->user;

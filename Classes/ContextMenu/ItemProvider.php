@@ -15,6 +15,7 @@ use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -27,15 +28,11 @@ class ItemProvider extends AbstractProvider
      * Constructor arguments are only needed for TYPO3 v11
      * @see https://docs.typo3.org/c/typo3/cms-core/12.4/en-us/Changelog/12.0/Breaking-96333-AutoConfigurationOfContextMenuItemProviders.html
      *
-     * @param string $table
-     * @param string $identifier
-     * @param string $context
-     * @param ResourceFactory|null $resourceFactory
      */
-    public function __construct(string $table, string $identifier, string $context = '', ?ResourceFactory $resourceFactory = null)
+    public function __construct()
     {
-        $this->resourceFactory = $resourceFactory ?? GeneralUtility::makeInstance(ResourceFactory::class);
-        parent::__construct($table, $identifier, $context);
+        $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+        parent::__construct();
     }
 
     public function getPriority(): int
@@ -49,7 +46,7 @@ class ItemProvider extends AbstractProvider
     }
 
     /**
-     * Initialize file object
+     * Initialize a file object
      *
      * @throws ResourceDoesNotExistException
      */
@@ -63,7 +60,7 @@ class ItemProvider extends AbstractProvider
             && !$resource->getStorage()->isPublic()
             && in_array(
                 $resource->getRole(),
-                [Folder::ROLE_DEFAULT, Folder::ROLE_USERUPLOAD],
+                [FolderInterface::ROLE_DEFAULT, FolderInterface::ROLE_USERUPLOAD],
                 true
             )
         ) {

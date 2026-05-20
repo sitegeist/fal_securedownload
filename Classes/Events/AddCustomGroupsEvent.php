@@ -29,7 +29,9 @@ namespace BeechIt\FalSecuredownload\Events;
 
 final class AddCustomGroupsEvent
 {
-    public function __construct(private array $customUserGroups) {}
+    public function __construct(private array $customUserGroups)
+    {
+    }
 
     public function getCustomUserGroups(): array
     {

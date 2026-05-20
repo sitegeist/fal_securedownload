@@ -29,7 +29,7 @@ namespace BeechIt\FalSecuredownload\Hooks;
 
 use Exception;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -37,7 +37,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CmsLayout
 {
-    public function __construct(protected ResourceFactory $resourceFactory)
+    public function __construct(protected StorageRepository $storageRepository)
     {
     }
 
@@ -66,8 +66,8 @@ class CmsLayout
             // Storage
             $storageName = '';
             try {
-                $storageUid = $this->getFieldFromFlexform('settings.storage');
-                $storageName = $this->resourceFactory->getStorageObject($storageUid)->getName();
+                $storageUid = (int) $this->getFieldFromFlexform('settings.storage');
+                $storageName = $this->storageRepository->findByUid($storageUid)?->getName() ?? '';
             } catch (Exception) {
             }
 

@@ -37,7 +37,9 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 class DownloadStatistics extends AbstractNode
 {
     protected array $resultArray = [];
-    public function __construct(private readonly ConnectionPool $connectionPool) {}
+    public function __construct(private readonly ConnectionPool $connectionPool)
+    {
+    }
 
     public function render(): array
     {

@@ -56,8 +56,8 @@ class FolderChangedEventListener implements SingletonInterface
     }
 
     /**
-     * Get sub folder structure of folder before is gets moved
-     * Is needed to update folder records when move was successful
+     * Get subfolder structure of the folder before is gets moved
+     * Is needed to update folder records when the move was successful
      *
      * @noinspection PhpUnused
      */
@@ -67,7 +67,7 @@ class FolderChangedEventListener implements SingletonInterface
     }
 
     /**
-     * Update folder permissions records when folder is moved
+     * Update folder permissions records when the folder is moved
      *
      * @noinspection PhpUnused
      */
@@ -75,11 +75,14 @@ class FolderChangedEventListener implements SingletonInterface
     {
         $folder = $event->getFolder();
         $newFolder = $event->getTargetFolder();
+        if (!$newFolder instanceof Folder) {
+            return;
+        }
         $this->updateFolderPermissions($folder, $newFolder);
     }
 
     /**
-     * Get sub folder structure of folder before is gets deleted
+     * Get subfolder structure of the folder before is gets deleted
      * Is needed to update folder records when delete was successful
      *
      * @noinspection PhpUnused
@@ -90,7 +93,7 @@ class FolderChangedEventListener implements SingletonInterface
     }
 
     /**
-     * Update folder permissions records when folder is deleted
+     * Update folder permissions records when the folder is deleted
      *
      * @noinspection PhpUnused
      */
@@ -109,7 +112,7 @@ class FolderChangedEventListener implements SingletonInterface
     }
 
     /**
-     * Get sub folder structure of folder before is gets renamed
+     * Get subfolder structure of the folder before is gets renamed
      * Is needed to update folder records when renaming was successful
      *
      * @noinspection PhpUnused

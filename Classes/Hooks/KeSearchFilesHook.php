@@ -44,20 +44,9 @@ class KeSearchFilesHook implements SingletonInterface
 
     /**
      * Check file permissions
-     *
-     * @param $fileObject
-     * @param string $content
-     * @param \Tpwd\KeSearch\Indexer\Types\File $fileIndexerObject
-     * @param string $feGroups
-     * @param array $ttContentRow
-     * @param int $storagePid
-     * @param string $title
-     * @param string $tags
-     * @param string $abstract
-     * @param array $additionalFields
      */
     public function modifyFileIndexEntryFromContentIndexer(
-        $fileObject,
+        mixed $fileObject,
         string $content,
         \Tpwd\KeSearch\Indexer\Types\File $fileIndexerObject,
         string &$feGroups,
@@ -84,15 +73,9 @@ class KeSearchFilesHook implements SingletonInterface
 
     /**
      * Get user permissions
-     *
-     * @param string|File $file
-     * @param string $content
-     * @param array $additionalFields
-     * @param array $indexRecordValues
-     * @param \Tpwd\KeSearch\Indexer\Types\File $indexer
      */
     public function modifyFileIndexEntry(
-        $file,
+        mixed $file,
         string $content,
         array $additionalFields,
         array &$indexRecordValues,

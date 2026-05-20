@@ -61,10 +61,10 @@ class DownloadLinkViewHelper extends AbstractTagBasedViewHelper
     public function initializeArguments(): void
     {
         parent::initializeArguments();
-        $this->registerTagAttribute('name', 'string', 'Specifies the name of an anchor');
-        $this->registerTagAttribute('rel', 'string', 'Specifies the relationship between the current document and the linked document');
-        $this->registerTagAttribute('rev', 'string', 'Specifies the relationship between the linked document and the current document');
-        $this->registerTagAttribute('target', 'string', 'Specifies where to open the linked document');
+        $this->registerArgument('name', 'string', 'Specifies the name of an anchor');
+        $this->registerArgument('rel', 'string', 'Specifies the relationship between the current document and the linked document');
+        $this->registerArgument('rev', 'string', 'Specifies the relationship between the linked document and the current document');
+        $this->registerArgument('target', 'string', 'Specifies where to open the linked document');
         $this->registerArgument('file', 'object', '', true);
         $this->registerArgument('uriOnly', 'bool', '', false, false);
     }

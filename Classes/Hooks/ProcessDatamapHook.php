@@ -39,6 +39,7 @@ class ProcessDatamapHook
     /**
      * Trigger updateFolderTree after change in tx_falsecuredownload_folder
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function processDatamap_afterDatabaseOperations(
         string $status,
         string $table,
@@ -54,14 +55,10 @@ class ProcessDatamapHook
     /**
      * Trigger updateFolderTree after a sys_file_collection record is deleted
      *
-     * @param string $command
-     * @param string $table
-     * @param string $id
      * @param mixed $value
-     * @param DataHandler $dataHandler
      * @param mixed $pasteUpdate
-     * @param array $pasteDatamap
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps
     public function processCmdmap_postProcess(
         string $command,
         string $table,

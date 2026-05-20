@@ -1,6 +1,6 @@
 <?php
 
-use TYPO3\CMS\Core\Information\Typo3Version;
+declare(strict_types=1);
 
 defined('TYPO3') || die();
 
@@ -83,12 +83,5 @@ $tca = [
         ],
     ],
 ];
-
-$typo3Version = new Typo3Version();
-if ($typo3Version->getMajorVersion() === 11) {
-    foreach ($tca['columns']['fe_groups']['config']['items'] as &$item) {
-        $item = array_values($item);
-    }
-}
 
 return $tca;

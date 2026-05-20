@@ -46,8 +46,7 @@ class BePublicUrlController extends AbstractApplication
             $parameters['p'] = (int)($GLOBALS['TYPO3_REQUEST']->getParsedBody()['p'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['p'] ?? null);
         }
 
-        if (
-            $this->hashService->hmac(implode('|', $parameters), 'BeResourceStorageDumpFile', HashAlgo::SHA3_256) === ($GLOBALS['TYPO3_REQUEST']->getParsedBody()['fal_token'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['fal_token'] ?? null)
+        if ($this->hashService->hmac(implode('|', $parameters), 'BeResourceStorageDumpFile', HashAlgo::SHA3_256) === ($GLOBALS['TYPO3_REQUEST']->getParsedBody()['fal_token'] ?? $GLOBALS['TYPO3_REQUEST']->getQueryParams()['fal_token'] ?? null)
         ) {
             if (isset($parameters['f'])) {
                 try {

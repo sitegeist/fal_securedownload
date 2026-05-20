@@ -14,7 +14,7 @@ fe_groups in the file module.
 1. Download and install fal_securedownload
 2. Un-check the 'public' checkbox in your file storage
 3. Add a .htaccess file with "Require all denied" in your file storage root
-   folder or move your storage outside your webroot
+    folder or move your storage outside your webroot
 4. Go to the file list and add access restrictions on file/folder
 
 ## Features

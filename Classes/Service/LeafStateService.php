@@ -43,17 +43,15 @@ class LeafStateService implements SingletonInterface
     public function saveLeafStateForUser(FrontendUserAuthentication $user, string $folder, bool $open): void
     {
         // check if folder exists
-        $folderObject = $this->resourceFactory->getFolderObjectFromCombinedIdentifier($folder);
+        $this->resourceFactory->getFolderObjectFromCombinedIdentifier($folder);
 
-        if ($folderObject) {
-            $folderState = $this->getFolderState($user);
-            if ($open) {
-                $folderState[$folder] = true;
-            } else {
-                unset($folderState[$folder]);
-            }
-            $this->saveFolderState($user, $folderState);
+        $folderState = $this->getFolderState($user);
+        if ($open) {
+            $folderState[$folder] = true;
+        } else {
+            unset($folderState[$folder]);
         }
+        $this->saveFolderState($user, $folderState);
     }
 
     /**
@@ -67,14 +65,12 @@ class LeafStateService implements SingletonInterface
 
     /**
      * Get leaf states from user session
-     *
-     * @return array|mixed
      */
-    protected function getFolderState(FrontendUserAuthentication $user)
+    protected function getFolderState(FrontendUserAuthentication $user): array
     {
         $folderStates = $user->getKey(empty($user->user['uid']) ? 'ses' : 'user', 'LeafStateService');
         if ($folderStates) {
-            $folderStates = unserialize($folderStates);
+            $folderStates = unserialize($folderStates, ['allowed_classes' => false]);
         }
         if (!is_array($folderStates)) {
             $folderStates = [];

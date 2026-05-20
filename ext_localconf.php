@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 use BeechIt\FalSecuredownload\Configuration\ExtensionConfiguration;
-use BeechIt\FalSecuredownload\ContextMenu\ItemProvider;
 use BeechIt\FalSecuredownload\Controller\FileTreeController;
 use BeechIt\FalSecuredownload\Controller\FileTreeStateController;
 use BeechIt\FalSecuredownload\FormEngine\DownloadStatistics;
@@ -36,11 +35,6 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['cms/layout/class.tx_cms_layout.php'][
 // Add FolderPermission button to docheader of filelist
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Backend\Template\Components\ButtonBar']['getButtonsHook']['FalSecuredownload']
     = DocHeaderButtonsHook::class . '->getButtons';
-
-// Context menu
-// Only needed for TYPO3 v11
-// https://docs.typo3.org/c/typo3/cms-core/12.4/en-us/Changelog/12.0/Breaking-96333-AutoConfigurationOfContextMenuItemProviders.html
-$GLOBALS['TYPO3_CONF_VARS']['BE']['ContextMenu']['ItemProviders'][1547242135] = ItemProvider::class;
 
 // refresh file tree after change in tx_falsecuredownload_folder record
 $GLOBALS ['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][] = ProcessDatamapHook::class;

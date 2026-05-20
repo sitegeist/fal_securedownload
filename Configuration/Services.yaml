@@ -9,10 +9,6 @@ services:
 
   BeechIt\FalSecuredownload\ContextMenu\ItemProvider:
     public: true
-    arguments:
-      $table: ''
-      $identifier: ''
-      $context: ''
 
   BeechIt\FalSecuredownload\Controller\BePublicUrlController:
     public: true

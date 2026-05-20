@@ -122,12 +122,10 @@ class CheckPermissions implements SingletonInterface
     /**
      * Check file access for given FeGroups combination
      *
-     * @param FileInterface $file
      * @param bool|array $userFeGroups FALSE = no login, array() fe groups of user
-     * @return bool
      * @throws FolderDoesNotExistException
      */
-    public function checkFileAccess(FileInterface $file, $userFeGroups): bool
+    public function checkFileAccess(FileInterface $file, bool|array $userFeGroups): bool
     {
         // all files in public storage are accessible
         if ($file->getStorage()->isPublic()) {
@@ -163,11 +161,9 @@ class CheckPermissions implements SingletonInterface
     /**
      * Check if given FeGroups have enough rights to access given folder
      *
-     * @param FolderInterface $folder
      * @param bool|array $userFeGroups FALSE = no login, array() is the groups of the user
-     * @return bool
      */
-    public function checkFolderRootLineAccess(FolderInterface $folder, $userFeGroups): bool
+    public function checkFolderRootLineAccess(FolderInterface $folder, bool|array $userFeGroups): bool
     {
         $cacheIdentifier = sha1(
             $folder->getHashedIdentifier() .
@@ -200,10 +196,9 @@ class CheckPermissions implements SingletonInterface
     /**
      * Get permissions set on folder (no root line check)
      *
-     * @param FolderInterface $folder
      * @return bool|string FALSE or comma separated list of fe_group uids
      */
-    public function getFolderPermissions(FolderInterface $folder)
+    public function getFolderPermissions(FolderInterface $folder): bool|string
     {
         $permissions = false;
         $folderRecord = $this->utilityService->getFolderRecord($folder);
@@ -232,9 +227,7 @@ class CheckPermissions implements SingletonInterface
 
                 // if record found check permissions
                 if ($folderRecord) {
-                    if ($feGroups === []) {
-                        $feGroups = GeneralUtility::trimExplode(',', $folderRecord['fe_groups'], true);
-                    }
+                    $feGroups = GeneralUtility::trimExplode(',', $folderRecord['fe_groups'], true);
                     if ($folderRecord['fe_groups']) {
                         $feGroups = ArrayUtility::keepItemsInArray($feGroups, $folderRecord['fe_groups']);
                     }
@@ -277,9 +270,9 @@ class CheckPermissions implements SingletonInterface
     /**
      * Get all folders in root line of given folder
      *
-     * @return Folder[]
+     * @return FolderInterface[]
      */
-    public function getFolderRootLine(FolderInterface $folder)
+    public function getFolderRootLine(FolderInterface $folder): array
     {
         return array_reverse($this->getReverseFolderRootLine($folder));
     }
@@ -287,11 +280,9 @@ class CheckPermissions implements SingletonInterface
     /**
      * Check if given groups match with the groups of a user
      *
-     * @param string $groups
      * @param bool|array $userFeGroups FALSE = no login, array() is the groups of the user
-     * @return bool
      */
-    public function matchFeGroupsWithFeUser(string $groups, $userFeGroups): bool
+    public function matchFeGroupsWithFeUser(string $groups, bool|array $userFeGroups): bool
     {
         // no groups specified everyone has access
         if ($groups === '') {
